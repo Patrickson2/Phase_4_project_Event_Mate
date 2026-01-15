@@ -6,11 +6,3 @@ class ParticipationCreate(BaseModel):
 class ParticipationUpdate(BaseModel):
     status: str
 
-class ParticipationResponse(BaseModel):
-    id: int
-    user_id: int
-    event_id: int
-    status: str
-
-    class Config:
-        from_attributes = True
