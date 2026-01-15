@@ -38,6 +38,7 @@ export const getCurrentUser = async () => {
   return res.json();
 };
 
+// Fetch all events
 export const getEvents = async () => {
   const res = await fetch(`${API_URL}/events`);
   if (!res.ok) throw new Error(await res.text());
