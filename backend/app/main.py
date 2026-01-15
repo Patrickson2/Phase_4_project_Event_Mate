@@ -14,3 +14,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+app.include_router(auth_router)
+app.include_router(events_router)
+app.include_router(participation_router)
+app.include_router(reviews_router)
+
