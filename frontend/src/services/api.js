@@ -52,6 +52,7 @@ export const getEvent = async (id) => {
   return res.json();
 };
 
+// Create new event
 export const createEvent = async (data) => {
   const res = await fetch(`${API_URL}/events`, {
     method: 'POST',
