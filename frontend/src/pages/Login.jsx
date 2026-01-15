@@ -1,10 +1,10 @@
 import { useState, useContext } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
-import { login as loginApi } from '../services/api';
 
 const Login = () => {
-  const [formData, setFormData] = useState({ email: '', password: '' });
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const { login } = useContext(AuthContext);
   const navigate = useNavigate();
@@ -13,38 +13,47 @@ const Login = () => {
     e.preventDefault();
     setError('');
     try {
-      const data = await loginApi(formData);
-      login(data.access_token, data.user);
+      await login(email, password);
       navigate('/dashboard');
     } catch (err) {
-      setError('Invalid credentials');
+      setError(err.response?.data?.detail || 'Login failed');
     }
   };
 
   return (
-    <div className="auth-page">
-      <div className="auth-container">
-        <h2>Login</h2>
-        {error && <div className="error">{error}</div>}
+    <div className="container">
+      <div className="form-container">
+        <h2 className="form-title">Login</h2>
+        {error && <div className="error-message">{error}</div>}
         <form onSubmit={handleSubmit}>
-          <input
-            type="email"
-            placeholder="Email"
-            value={formData.email}
-            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-            required
-          />
-          <input
-            type="password"
-            placeholder="Password"
-            value={formData.password}
-            onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-            required
-          />
-          <button type="submit" className="btn btn-primary">Login</button>
+          <div className="form-group">
+            <label>Email</label>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+          </div>
+          <div className="form-group">
+            <label>Password</label>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+          </div>
+          <button type="submit" className="btn btn-primary" style={{width: '100%'}}>
+            Login
+          </button>
         </form>
-        <p>Don't have an account? <Link to="/register">Register</Link></p>
-        <p><Link to="/forgot-password">Forgot Password?</Link></p>
+        <div className="form-link">
+          Don't have an account? <Link to="/register">Register</Link>
+        </div>
+        <div className="form-link">
+          <Link to="/forgot-password">Forgot Password?</Link>
+        </div>
       </div>
     </div>
   );

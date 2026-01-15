@@ -7,25 +7,31 @@ const ForgotPassword = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    setMessage('Password reset link sent to your email');
+    setMessage('Password reset link sent to your email (Demo)');
   };
 
   return (
-    <div className="auth-page">
-      <div className="auth-container">
-        <h2>Forgot Password</h2>
-        {message && <div className="success">{message}</div>}
+    <div className="container">
+      <div className="form-container">
+        <h2 className="form-title">Forgot Password</h2>
+        {message && <div className="success-message">{message}</div>}
         <form onSubmit={handleSubmit}>
-          <input
-            type="email"
-            placeholder="Enter your email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
-          <button type="submit" className="btn btn-primary">Reset Password</button>
+          <div className="form-group">
+            <label>Email</label>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+          </div>
+          <button type="submit" className="btn btn-primary" style={{width: '100%'}}>
+            Reset Password
+          </button>
         </form>
-        <p><Link to="/login">Back to Login</Link></p>
+        <div className="form-link">
+          <Link to="/login">Back to Login</Link>
+        </div>
       </div>
     </div>
   );

@@ -5,22 +5,28 @@ const Profile = () => {
   const { user } = useContext(AuthContext);
 
   return (
-    <div className="profile">
-      <div className="profile-container">
-        <h1>Profile</h1>
-        <div className="profile-info">
-          <div className="profile-field">
-            <label>Name:</label>
-            <p>{user.name}</p>
-          </div>
-          <div className="profile-field">
-            <label>Email:</label>
-            <p>{user.email}</p>
-          </div>
-          <div className="profile-field">
-            <label>Member Since:</label>
-            <p>{new Date(user.created_at).toLocaleDateString()}</p>
-          </div>
+    <div className="container">
+      <div className="form-container">
+        <h2 className="form-title">My Profile</h2>
+        <div className="form-group">
+          <label>Name</label>
+          <input type="text" value={user?.name || ''} disabled />
+        </div>
+        <div className="form-group">
+          <label>Email</label>
+          <input type="email" value={user?.email || ''} disabled />
+        </div>
+        <div className="form-group">
+          <label>Role</label>
+          <input type="text" value={user?.role || ''} disabled />
+        </div>
+        <div className="form-group">
+          <label>Member Since</label>
+          <input
+            type="text"
+            value={user?.created_at ? new Date(user.created_at).toLocaleDateString() : ''}
+            disabled
+          />
         </div>
       </div>
     </div>

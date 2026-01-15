@@ -1,134 +1,118 @@
 import { useState, useEffect, useContext } from 'react';
 import { Link } from 'react-router-dom';
+import { eventsAPI } from '../services/api';
 import { AuthContext } from '../context/AuthContext';
-import { getEvents, createEvent, updateEvent, deleteEvent } from '../services/api';
 
 const MyEvents = () => {
   const { user } = useContext(AuthContext);
   const [events, setEvents] = useState([]);
-  const [formData, setFormData] = useState({ title: '', description: '', location: '', datetime: '' });
-  const [editingId, setEditingId] = useState(null);
-  const [loading, setLoading] = useState(true);
-
-  const loadEvents = async () => {
-    try {
-      const data = await getEvents();
-      setEvents(data.filter(e => e.organizer_id === user.id));
-    } finally {
-      setLoading(false);
-    }
-  };
+  const [showForm, setShowForm] = useState(false);
+  const [title, setTitle] = useState('');
+  const [description, setDescription] = useState('');
+  const [location, setLocation] = useState('');
+  const [datetime, setDatetime] = useState('');
+  const [message, setMessage] = useState('');
 
   useEffect(() => {
     loadEvents();
-  }, [user]);
+  }, []);
+
+  const loadEvents = () => {
+    eventsAPI.getAll().then(res => {
+      const myEvents = res.data.filter(e => e.organizer_id === user.id);
+      setEvents(myEvents);
+    });
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      if (editingId) {
-        await updateEvent(editingId, formData);
-        setEditingId(null);
-      } else {
-        await createEvent(formData);
-      }
-      setFormData({ title: '', description: '', location: '', datetime: '' });
+      await eventsAPI.create({ title, description, location, datetime });
+      setMessage('Event created successfully!');
+      setShowForm(false);
+      setTitle('');
+      setDescription('');
+      setLocation('');
+      setDatetime('');
       loadEvents();
     } catch (err) {
-      alert('Failed to save event');
+      setMessage('Failed to create event');
     }
   };
-
-  const handleEdit = (event) => {
-    setEditingId(event.id);
-    setFormData({
-      title: event.title,
-      description: event.description,
-      location: event.location,
-      datetime: event.datetime.slice(0, 16)
-    });
-  };
-
-  const handleDelete = async (id) => {
-    if (confirm('Delete this event?')) {
-      try {
-        await deleteEvent(id);
-        loadEvents();
-      } catch (err) {
-        alert('Failed to delete event');
-      }
-    }
-  };
-
-  if (loading) return <div>Loading...</div>;
 
   return (
-    <div className="my-events">
+    <div className="container">
       <h1>My Events</h1>
-      
-      <div className="event-form-container">
-        <h2>{editingId ? 'Edit Event' : 'Create New Event'}</h2>
-        <form onSubmit={handleSubmit} className="event-form">
-          <input
-            type="text"
-            placeholder="Event Title"
-            value={formData.title}
-            onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-            required
-          />
-          <textarea
-            placeholder="Description"
-            value={formData.description}
-            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-            required
-          />
-          <input
-            type="text"
-            placeholder="Location"
-            value={formData.location}
-            onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-            required
-          />
-          <input
-            type="datetime-local"
-            value={formData.datetime}
-            onChange={(e) => setFormData({ ...formData, datetime: e.target.value })}
-            required
-          />
-          <div className="form-buttons">
-            <button type="submit" className="btn btn-primary">
-              {editingId ? 'Update' : 'Create'} Event
-            </button>
-            {editingId && (
-              <button type="button" onClick={() => {
-                setEditingId(null);
-                setFormData({ title: '', description: '', location: '', datetime: '' });
-              }} className="btn btn-secondary">
-                Cancel
-              </button>
-            )}
-          </div>
-        </form>
-      </div>
+      <button onClick={() => setShowForm(!showForm)} className="btn btn-primary">
+        {showForm ? 'Cancel' : 'Create New Event'}
+      </button>
 
-      <div className="events-list">
-        <h2>Your Events</h2>
-        <div className="events-grid">
-          {events.map(event => (
-            <div key={event.id} className="event-card">
-              <h3>{event.title}</h3>
-              <p>{event.description}</p>
-              <p> {event.location}</p>
-              <p> {new Date(event.datetime).toLocaleString()}</p>
-              <p> {event.participants?.filter(p => p.status === 'confirmed').length || 0} participants</p>
-              <div className="event-actions">
-                <Link to={`/events/${event.id}`} className="btn btn-primary">View</Link>
-                <button onClick={() => handleEdit(event)} className="btn btn-secondary">Edit</button>
-                <button onClick={() => handleDelete(event.id)} className="btn btn-danger">Delete</button>
-              </div>
+      {showForm && (
+        <div className="form-container">
+          <h2 className="form-title">Create Event</h2>
+          {message && <div className="success-message">{message}</div>}
+          <form onSubmit={handleSubmit}>
+            <div className="form-group">
+              <label>Title</label>
+              <input
+                type="text"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                required
+              />
             </div>
-          ))}
+            <div className="form-group">
+              <label>Description</label>
+              <textarea
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                required
+              />
+            </div>
+            <div className="form-group">
+              <label>Location</label>
+              <input
+                type="text"
+                value={location}
+                onChange={(e) => setLocation(e.target.value)}
+                required
+              />
+            </div>
+            <div className="form-group">
+              <label>Date & Time</label>
+              <input
+                type="datetime-local"
+                value={datetime}
+                onChange={(e) => setDatetime(e.target.value)}
+                required
+              />
+            </div>
+            <button type="submit" className="btn btn-primary" style={{width: '100%'}}>
+              Create Event
+            </button>
+          </form>
         </div>
+      )}
+
+      <div className="events-grid">
+        {events.length === 0 ? (
+          <div className="empty-state">
+            <h3>No events created yet</h3>
+            <p>Create your first event to get started</p>
+          </div>
+        ) : (
+          events.map(event => (
+            <div key={event.id} className="card">
+              <h3 className="card-title">{event.title}</h3>
+              <p className="card-text">{event.description}</p>
+              <p className="card-text">📍 {event.location}</p>
+              <p className="card-text">📅 {new Date(event.datetime).toLocaleString()}</p>
+              <Link to={`/events/${event.id}`} className="btn btn-primary">
+                View Details
+              </Link>
+            </div>
+          ))
+        )}
       </div>
     </div>
   );

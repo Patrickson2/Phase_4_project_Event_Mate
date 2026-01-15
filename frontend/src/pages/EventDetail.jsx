@@ -1,132 +1,118 @@
 import { useState, useEffect, useContext } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
+import { eventsAPI, participationAPI, reviewsAPI } from '../services/api';
 import { AuthContext } from '../context/AuthContext';
-import { getEvent, joinEvent, leaveEvent, getReviews, createReview, deleteReview } from '../services/api';
 
 const EventDetail = () => {
   const { id } = useParams();
   const { user } = useContext(AuthContext);
+  const navigate = useNavigate();
   const [event, setEvent] = useState(null);
   const [reviews, setReviews] = useState([]);
-  const [reviewForm, setReviewForm] = useState({ rating: 5, comment: '' });
-  const [loading, setLoading] = useState(true);
-
-  const loadData = async () => {
-    try {
-      const [eventData, reviewsData] = await Promise.all([
-        getEvent(id),
-        getReviews(id)
-      ]);
-      setEvent(eventData);
-      setReviews(reviewsData);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const [rating, setRating] = useState(5);
+  const [comment, setComment] = useState('');
+  const [message, setMessage] = useState('');
 
   useEffect(() => {
-    loadData();
+    eventsAPI.getOne(id).then(res => setEvent(res.data));
+    reviewsAPI.getByEvent(id).then(res => setReviews(res.data));
   }, [id]);
 
   const handleJoin = async () => {
     try {
-      await joinEvent(id);
-      loadData();
+      await participationAPI.join(id);
+      setMessage('Successfully joined event!');
     } catch (err) {
-      alert('Failed to join event');
+      setMessage(err.response?.data?.detail || 'Failed to join');
     }
   };
 
-  const handleLeave = async () => {
-    const participation = event.participants?.find(p => p.user_id === user.id);
-    if (participation) {
+  const handleReview = async (e) => {
+    e.preventDefault();
+    try {
+      await reviewsAPI.create({ event_id: parseInt(id), rating, comment });
+      setMessage('Review submitted!');
+      setComment('');
+      reviewsAPI.getByEvent(id).then(res => setReviews(res.data));
+    } catch (err) {
+      setMessage('Failed to submit review');
+    }
+  };
+
+  const handleDelete = async () => {
+    if (window.confirm('Delete this event?')) {
       try {
-        await leaveEvent(participation.id);
-        loadData();
+        await eventsAPI.delete(id);
+        navigate('/my-events');
       } catch (err) {
-        alert('Failed to leave event');
+        setMessage('Failed to delete event');
       }
     }
   };
 
-  const handleReviewSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      await createReview({ event_id: parseInt(id), ...reviewForm });
-      setReviewForm({ rating: 5, comment: '' });
-      loadData();
-    } catch (err) {
-      alert('Failed to submit review');
-    }
-  };
-
-  const handleDeleteReview = async (reviewId) => {
-    try {
-      await deleteReview(reviewId);
-      loadData();
-    } catch (err) {
-      alert('Failed to delete review');
-    }
-  };
-
-  if (loading) return <div>Loading...</div>;
-  if (!event) return <div>Event not found</div>;
-
-  const isParticipant = event.participants?.some(p => p.user_id === user?.id && p.status === 'confirmed');
-  const isOrganizer = event.organizer_id === user?.id;
+  if (!event) return <div className="loading">Loading...</div>;
 
   return (
-    <div className="event-detail">
-      <div className="event-header">
+    <div className="container">
+      <div className="event-detail">
         <h1>{event.title}</h1>
         <p>{event.description}</p>
-        <p> {event.location}</p>
-        <p> {new Date(event.datetime).toLocaleString()}</p>
-        <p> Organizer: {event.organizer?.name}</p>
-        <p> Participants: {event.participants?.filter(p => p.status === 'confirmed').length || 0}</p>
-      </div>
-
-      {!isOrganizer && (
-        <div className="event-actions">
-          {isParticipant ? (
-            <button onClick={handleLeave} className="btn btn-secondary">Leave Event</button>
-          ) : (
+        <div className="event-info">
+          <div className="event-info-item">
+            <strong>Location</strong>
+            <span>{event.location}</span>
+          </div>
+          <div className="event-info-item">
+            <strong>Date & Time</strong>
+            <span>{new Date(event.datetime).toLocaleString()}</span>
+          </div>
+        </div>
+        {message && <div className="success-message">{message}</div>}
+        <div className="card-actions">
+          {user && user.id !== event.organizer_id && (
             <button onClick={handleJoin} className="btn btn-primary">Join Event</button>
           )}
+          {user && user.id === event.organizer_id && (
+            <button onClick={handleDelete} className="btn btn-danger">Delete Event</button>
+          )}
         </div>
-      )}
+      </div>
 
       <div className="reviews-section">
         <h2>Reviews</h2>
-        {isParticipant && (
-          <form onSubmit={handleReviewSubmit} className="review-form">
-            <select value={reviewForm.rating} onChange={(e) => setReviewForm({ ...reviewForm, rating: parseInt(e.target.value) })}>
-              {[1, 2, 3, 4, 5].map(n => <option key={n} value={n}>{n} ⭐</option>)}
-            </select>
-            <textarea
-              placeholder="Write your review..."
-              value={reviewForm.comment}
-              onChange={(e) => setReviewForm({ ...reviewForm, comment: e.target.value })}
-              required
-            />
-            <button type="submit" className="btn btn-primary">Submit Review</button>
-          </form>
-        )}
+        {reviews.map(review => (
+          <div key={review.id} className="review-card">
+            <div className="review-rating">⭐ {review.rating}/5</div>
+            <p className="review-comment">{review.comment}</p>
+          </div>
+        ))}
 
-        <div className="reviews-list">
-          {reviews.map(review => (
-            <div key={review.id} className="review-card">
-              <div className="review-header">
-                <strong>{review.user?.name}</strong>
-                <span>{''.repeat(review.rating)}</span>
+        {user && (
+          <div className="form-container">
+            <h3>Leave a Review</h3>
+            <form onSubmit={handleReview}>
+              <div className="form-group">
+                <label>Rating</label>
+                <select value={rating} onChange={(e) => setRating(e.target.value)}>
+                  <option value="5">5 - Excellent</option>
+                  <option value="4">4 - Good</option>
+                  <option value="3">3 - Average</option>
+                  <option value="2">2 - Poor</option>
+                  <option value="1">1 - Terrible</option>
+                </select>
               </div>
-              <p>{review.comment}</p>
-              {review.user_id === user?.id && (
-                <button onClick={() => handleDeleteReview(review.id)} className="btn-delete">Delete</button>
-              )}
-            </div>
-          ))}
-        </div>
+              <div className="form-group">
+                <label>Comment</label>
+                <textarea
+                  value={comment}
+                  onChange={(e) => setComment(e.target.value)}
+                  required
+                />
+              </div>
+              <button type="submit" className="btn btn-primary">Submit Review</button>
+            </form>
+          </div>
+        )}
       </div>
     </div>
   );
