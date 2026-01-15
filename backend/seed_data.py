@@ -96,3 +96,29 @@ def create_sample_data():
             db.add(participation)
         db.commit()
         print("Created 4 participations")
+
+        reviews = [
+            Review(
+                event_id=1,
+                user_id=2,
+                rating=5,
+                comment="Amazing event! Learned so much about AI and networking."
+            ),
+            Review(
+                event_id=1,
+                user_id=3,
+                rating=4,
+                comment="Great speakers and content. Venue was a bit crowded."
+            ),
+            Review(
+                event_id=3,
+                user_id=1,
+                rating=5,
+                comment="Perfect for networking. Met some incredible people!"
+            )
+        ]
+        
+        for review in reviews:
+            db.add(review)
+        db.commit()
+        print("Created 3 reviews")
