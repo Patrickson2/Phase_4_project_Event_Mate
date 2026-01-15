@@ -20,3 +20,7 @@ app.include_router(events_router)
 app.include_router(participation_router)
 app.include_router(reviews_router)
 
+@app.get("/")
+def root():
+    return {"message": "Welcome to EventMate API"}
+
