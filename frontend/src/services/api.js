@@ -1,129 +1,45 @@
-// Base API URL for backend communication
+import axios from 'axios';
+
 const API_URL = 'http://localhost:8000';
 
-// Helper function to get authorization headers
-const getAuthHeaders = () => {
+const api = axios.create({
+  baseURL: API_URL,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
+
+api.interceptors.request.use((config) => {
   const token = localStorage.getItem('token');
-  return token ? { Authorization: `Bearer ${token}` } : {};
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
+export const authAPI = {
+  register: (data) => api.post('/auth/register', data),
+  login: (data) => api.post('/auth/login', data),
+  getMe: () => api.get('/auth/me'),
 };
 
-// User registration API call
-export const register = async (data) => {
-  const res = await fetch(`${API_URL}/auth/register`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(data)
-  });
-  if (!res.ok) throw new Error(await res.text());
-  return res.json();
+export const eventsAPI = {
+  getAll: () => api.get('/events'),
+  getOne: (id) => api.get(`/events/${id}`),
+  create: (data) => api.post('/events', data),
+  update: (id, data) => api.patch(`/events/${id}`, data),
+  delete: (id) => api.delete(`/events/${id}`),
 };
 
-// User login API call
-export const login = async (data) => {
-  const res = await fetch(`${API_URL}/auth/login`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(data)
-  });
-  if (!res.ok) throw new Error(await res.text());
-  return res.json();
+export const participationAPI = {
+  join: (eventId) => api.post('/participation', { event_id: eventId }),
+  update: (id, status) => api.patch(`/participation/${id}`, { status }),
 };
 
-// Get current authenticated user
-export const getCurrentUser = async () => {
-  const res = await fetch(`${API_URL}/auth/me`, {
-    headers: getAuthHeaders()
-  });
-  if (!res.ok) throw new Error(await res.text());
-  return res.json();
+export const reviewsAPI = {
+  create: (data) => api.post('/reviews', data),
+  getByEvent: (eventId) => api.get(`/reviews/${eventId}`),
+  delete: (id) => api.delete(`/reviews/${id}`),
 };
 
-// Fetch all events
-export const getEvents = async () => {
-  const res = await fetch(`${API_URL}/events`);
-  if (!res.ok) throw new Error(await res.text());
-  return res.json();
-};
-
-// Fetch single event by ID
-export const getEvent = async (id) => {
-  const res = await fetch(`${API_URL}/events/${id}`);
-  if (!res.ok) throw new Error(await res.text());
-  return res.json();
-};
-
-// Create new event
-export const createEvent = async (data) => {
-  const res = await fetch(`${API_URL}/events`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
-    body: JSON.stringify(data)
-  });
-  if (!res.ok) throw new Error(await res.text());
-  return res.json();
-};
-
-// Update existing event
-export const updateEvent = async (id, data) => {
-  const res = await fetch(`${API_URL}/events/${id}`, {
-    method: 'PATCH',
-    headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
-    body: JSON.stringify(data)
-  });
-  if (!res.ok) throw new Error(await res.text());
-  return res.json();
-};
-
-// Delete event by ID
-export const deleteEvent = async (id) => {
-  const res = await fetch(`${API_URL}/events/${id}`, {
-    method: 'DELETE',
-    headers: getAuthHeaders()
-  });
-  if (!res.ok) throw new Error(await res.text());
-};
-
-// Join an event as a participant
-export const joinEvent = async (eventId) => {
-  const res = await fetch(`${API_URL}/participation`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
-    body: JSON.stringify({ event_id: eventId })
-  });
-  if (!res.ok) throw new Error(await res.text());
-  return res.json();
-};
-
-export const leaveEvent = async (participationId) => {
-  const res = await fetch(`${API_URL}/participation/${participationId}`, {
-    method: 'PATCH',
-    headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
-    body: JSON.stringify({ status: 'cancelled' })
-  });
-  if (!res.ok) throw new Error(await res.text());
-  return res.json();
-};
-
-export const getReviews = async (eventId) => {
-  const res = await fetch(`${API_URL}/reviews/${eventId}`);
-  if (!res.ok) throw new Error(await res.text());
-  return res.json();
-};
-
-export const createReview = async (data) => {
-  const res = await fetch(`${API_URL}/reviews`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
-    body: JSON.stringify(data)
-  });
-  if (!res.ok) throw new Error(await res.text());
-  return res.json();
-};
-
-export const deleteReview = async (id) => {
-  const res = await fetch(`${API_URL}/reviews/${id}`, {
-    method: 'DELETE',
-    headers: getAuthHeaders()
-  });
-  if (!res.ok) throw new Error(await res.text());
-};
+export default api;
