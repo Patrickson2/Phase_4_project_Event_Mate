@@ -17,11 +17,11 @@ const Home = () => {
           <p>Find events that match your interests</p>
         </div>
         <div className="feature">
-          <h3>👥 Join Community</h3>
+          <h3>Join Community</h3>
           <p>Connect with like-minded people</p>
         </div>
         <div className="feature">
-          <h3>⭐ Leave Reviews</h3>
+          <h3> Leave Reviews</h3>
           <p>Share your experience with others</p>
         </div>
       </div>

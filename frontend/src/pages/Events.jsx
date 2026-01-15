@@ -22,8 +22,8 @@ const Events = () => {
           <div key={event.id} className="event-card">
             <h3>{event.title}</h3>
             <p>{event.description}</p>
-            <p>📍 {event.location}</p>
-            <p>📅 {new Date(event.datetime).toLocaleString()}</p>
+            <p> {event.location}</p>
+            <p> {new Date(event.datetime).toLocaleString()}</p>
             <Link to={`/events/${event.id}`} className="btn btn-primary">View Details</Link>
           </div>
         ))}
