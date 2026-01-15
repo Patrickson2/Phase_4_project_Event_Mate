@@ -84,5 +84,15 @@ def create_sample_data():
             db.add(event)
         db.commit()
         print("Created 5 events")
+
+        participations = [
+            Participation(user_id=2, event_id=1, status="joined"),
+            Participation(user_id=3, event_id=1, status="joined"),
+            Participation(user_id=1, event_id=3, status="joined"),
+            Participation(user_id=3, event_id=2, status="joined"),
+        ]
         
-       
+        for participation in participations:
+            db.add(participation)
+        db.commit()
+        print("Created 4 participations")
