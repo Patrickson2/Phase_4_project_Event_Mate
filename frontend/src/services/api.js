@@ -29,6 +29,7 @@ export const login = async (data) => {
   return res.json();
 };
 
+// Get current authenticated user
 export const getCurrentUser = async () => {
   const res = await fetch(`${API_URL}/auth/me`, {
     headers: getAuthHeaders()
