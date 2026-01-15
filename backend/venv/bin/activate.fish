@@ -33,7 +33,7 @@ end
 # Unset irrelevant variables.
 deactivate nondestructive
 
-set -gx VIRTUAL_ENV /home/mungai/Documents/P-Projects/Phase_4_project_Event_Mate/backend/venv
+set -gx VIRTUAL_ENV /home/jb/Documents/Moringa-Projects/Phase_4/Phase_4_project_Event_Mate/backend/venv
 
 set -gx _OLD_VIRTUAL_PATH $PATH
 set -gx PATH "$VIRTUAL_ENV/"bin $PATH
