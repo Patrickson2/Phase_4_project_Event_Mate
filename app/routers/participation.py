@@ -35,3 +35,22 @@ def join_event(
     db.commit()
     db.refresh(new_participation)
     return new_participation
+
+@router.patch("/{participation_id}", response_model=ParticipationResponse)
+def update_participation(
+    participation_id: int,
+    participation_update: ParticipationUpdate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    participation = db.query(Participation).filter(Participation.id == participation_id).first()
+    if not participation:
+        raise HTTPException(status_code=404, detail="Participation not found")
+    
+    if participation.user_id != current_user.id:
+        raise HTTPException(status_code=403, detail="Not authorized")
+    
+    participation.status = participation_update.status
+    db.commit()
+    db.refresh(participation)
+    return participation
