@@ -1,6 +1,7 @@
 // Base API URL for backend communication
 const API_URL = 'http://localhost:8000';
 
+// Helper function to get authorization headers
 const getAuthHeaders = () => {
   const token = localStorage.getItem('token');
   return token ? { Authorization: `Bearer ${token}` } : {};
