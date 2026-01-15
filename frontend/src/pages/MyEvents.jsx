@@ -118,9 +118,9 @@ const MyEvents = () => {
             <div key={event.id} className="event-card">
               <h3>{event.title}</h3>
               <p>{event.description}</p>
-              <p>📍 {event.location}</p>
-              <p>📅 {new Date(event.datetime).toLocaleString()}</p>
-              <p>👥 {event.participants?.filter(p => p.status === 'confirmed').length || 0} participants</p>
+              <p> {event.location}</p>
+              <p> {new Date(event.datetime).toLocaleString()}</p>
+              <p> {event.participants?.filter(p => p.status === 'confirmed').length || 0} participants</p>
               <div className="event-actions">
                 <Link to={`/events/${event.id}`} className="btn btn-primary">View</Link>
                 <button onClick={() => handleEdit(event)} className="btn btn-secondary">Edit</button>

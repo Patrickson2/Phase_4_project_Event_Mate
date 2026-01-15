@@ -5,6 +5,7 @@ __pycache__/
 *.so
 *.egg-info/
 .env
+*.pyc
 
 # Database
 *.db
@@ -29,3 +30,6 @@ Thumbs.db
 # Logs
 *.log
 npm-debug.log*
+__pycache__/
+*.py[cod]
+node_modules/

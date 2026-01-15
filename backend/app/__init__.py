@@ -1,1 +1,1 @@
-# TODO: Implement
+from .main import app

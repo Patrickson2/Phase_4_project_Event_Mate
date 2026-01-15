@@ -1,5 +1,5 @@
 import { createContext, useState, useEffect } from 'react';
-import { getCurrentUser } from '../services/api';
+import { authAPI } from '../services/api';
 
 export const AuthContext = createContext();
 
@@ -10,8 +10,8 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (token) {
-      getCurrentUser()
-        .then(data => setUser(data))
+      authAPI.getMe()
+        .then(res => setUser(res.data))
         .catch(() => localStorage.removeItem('token'))
         .finally(() => setLoading(false));
     } else {
@@ -19,9 +19,16 @@ export const AuthProvider = ({ children }) => {
     }
   }, []);
 
-  const login = (token, userData) => {
-    localStorage.setItem('token', token);
-    setUser(userData);
+  const login = async (email, password) => {
+    const res = await authAPI.login({ email, password });
+    localStorage.setItem('token', res.data.access_token);
+    const userRes = await authAPI.getMe();
+    setUser(userRes.data);
+  };
+
+  const register = async (name, email, password) => {
+    await authAPI.register({ name, email, password });
+    await login(email, password);
   };
 
   const logout = () => {
@@ -30,7 +37,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, loading }}>
+    <AuthContext.Provider value={{ user, login, register, logout, loading }}>
       {children}
     </AuthContext.Provider>
   );

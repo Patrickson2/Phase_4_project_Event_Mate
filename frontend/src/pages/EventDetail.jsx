@@ -80,10 +80,10 @@ const EventDetail = () => {
       <div className="event-header">
         <h1>{event.title}</h1>
         <p>{event.description}</p>
-        <p>📍 {event.location}</p>
-        <p>📅 {new Date(event.datetime).toLocaleString()}</p>
-        <p>👤 Organizer: {event.organizer?.name}</p>
-        <p>👥 Participants: {event.participants?.filter(p => p.status === 'confirmed').length || 0}</p>
+        <p> {event.location}</p>
+        <p> {new Date(event.datetime).toLocaleString()}</p>
+        <p> Organizer: {event.organizer?.name}</p>
+        <p> Participants: {event.participants?.filter(p => p.status === 'confirmed').length || 0}</p>
       </div>
 
       {!isOrganizer && (
@@ -118,7 +118,7 @@ const EventDetail = () => {
             <div key={review.id} className="review-card">
               <div className="review-header">
                 <strong>{review.user?.name}</strong>
-                <span>{'⭐'.repeat(review.rating)}</span>
+                <span>{''.repeat(review.rating)}</span>
               </div>
               <p>{review.comment}</p>
               {review.user_id === user?.id && (
