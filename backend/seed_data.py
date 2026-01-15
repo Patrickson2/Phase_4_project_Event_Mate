@@ -41,3 +41,48 @@ def create_sample_data():
             db.add(user)
         db.commit()
         print("Created 3 users")
+
+        events = [
+            Event(
+                title="Tech Conference 2024",
+                description="Annual technology conference featuring the latest in AI and web development",
+                location="San Francisco, CA",
+                datetime=datetime.now() + timedelta(days=30),
+                organizer_id=1
+            ),
+            Event(
+                title="Python Workshop",
+                description="Hands-on workshop for learning Python programming from scratch",
+                location="New York, NY",
+                datetime=datetime.now() + timedelta(days=15),
+                organizer_id=1
+            ),
+            Event(
+                title="Startup Networking Event",
+                description="Connect with entrepreneurs and investors in the startup ecosystem",
+                location="Austin, TX",
+                datetime=datetime.now() + timedelta(days=7),
+                organizer_id=2
+            ),
+            Event(
+                title="Web Development Bootcamp",
+                description="Intensive 3-day bootcamp covering React, Node.js, and databases",
+                location="Seattle, WA",
+                datetime=datetime.now() + timedelta(days=45),
+                organizer_id=2
+            ),
+            Event(
+                title="AI & Machine Learning Summit",
+                description="Explore the future of artificial intelligence and machine learning",
+                location="Boston, MA",
+                datetime=datetime.now() + timedelta(days=60),
+                organizer_id=3
+            )
+        ]
+        
+        for event in events:
+            db.add(event)
+        db.commit()
+        print("Created 5 events")
+        
+       
