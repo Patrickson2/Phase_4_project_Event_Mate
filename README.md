@@ -76,21 +76,21 @@ npm run dev
 **Register:**
 
 ```
-POST http://localhost:8000/auth/register
+POST http://localhost:8001/auth/register
 {"name": "John", "email": "john@test.com", "password": "pass123"}
 ```
 
 **Login:**
 
 ```
-POST http://localhost:8000/auth/login
+POST http://localhost:8001/auth/login
 {"email": "john@test.com", "password": "pass123"}
 ```
 
 **Create Event (use token):**
 
 ```
-POST http://localhost:8000/events
+POST http://localhost:8001/events
 Authorization: Bearer YOUR_TOKEN
 {
   "title": "Tech Meetup",
