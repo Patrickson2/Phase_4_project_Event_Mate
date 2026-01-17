@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = 'http://localhost:8001';
+const API_URL = 'https://phase-4-project-event-mate.onrender.com/';
 
 const api = axios.create({
   baseURL: API_URL,
