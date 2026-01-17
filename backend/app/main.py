@@ -9,7 +9,7 @@ app = FastAPI(title="EventMate API")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5183"],
+    allow_origins=["https://phase-4-project-event-mate.vercel.app/"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
